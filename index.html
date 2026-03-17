@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>$WEAKIUM Laboratory</title>
+
+    <style>
+        :root {
+            --accent: #6D8DF4;
+            --bg: #05070f;
+            --panel: #0b0f1f;
+            --text: #e9ecff;
+            --muted: #7a84a8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* PARTICLE FIELD */
+
+        #particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* GRID BACKGROUND */
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(109, 141, 244, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(109, 141, 244, .05) 1px, transparent 1px);
+            background-size: 70px 70px;
+            z-index: -1;
+        }
+
+        /* SCAN LINE */
+        /* TOPBAR */
+
+        .topbar {
+            position: fixed;
+            top: 20px;
+            right: 25px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .topbar a,
+        .topbar button {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            border: 1px solid #1c2246;
+            background: #0b0f1f;
+            color: #e9ecff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .topbar a:hover,
+        .topbar button:hover {
+            border-color: #6D8DF4;
+            box-shadow: 0 0 10px rgba(109, 141, 244, .6);
+        }
+
+
+        /* DISCOVERY LOG STYLE */
+
+        .discovery p {
+            margin-top: 16px;
+            font-size: 18px;
+            letter-spacing: .6px;
+        }
+
+        .discovery .highlight {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #6D8DF4;
+        }
+
+        .discovery .event {
+            font-weight: 700;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .discovery .reaction {
+            margin-top: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .scan {
+            position: fixed;
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: scan 7s linear infinite;
+            opacity: .5;
+        }
+
+        @keyframes scan {
+            0% {
+                top: -10%
+            }
+
+            100% {
+                top: 110%
+            }
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            padding: 50px 20px;
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero img {
+            width: 180px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 56px;
+            letter-spacing: 6px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-top: 10px;
+        }
+
+        /* PANELS */
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid #1c2246;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 50px;
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+        }
+
+        /* MOLECULE */
+
+        .molecule {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .atom {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        .atom:nth-child(2) {
+            animation-delay: .4s
+        }
+
+        .atom:nth-child(3) {
+            animation-delay: .8s
+        }
+
+        .atom:nth-child(4) {
+            animation-delay: 1.2s
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.7)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        /* TERMINAL */
+
+        .terminal {
+            background: #02040a;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--accent);
+            height: 150px;
+            overflow: hidden;
+        }
+
+        /* CHART */
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        /* EXPOSURE TEST */
+
+        .test-button {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-family: monospace;
+            color: var(--accent);
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+
+        <a href="https://twitter.com/YOURPAGE" target="_blank" class="twitter">
+            Twitter
+        </a>
+
+        <button class="copy" onclick="copyAddress()">
+            Copy Address
+        </button>
+
+    </div>
+    <canvas id="particles"></canvas>
+    <div class="scan"></div>
+
+    <div class="container">
+
+        <section class="hero">
+
+            <img src="logo.jpg">
+
+            <h1>$WEAKIUM</h1>
+
+            <p class="subtitle">Weakness Detection Compound</p>
+
+        </section>
+
+
+        <div class="panel discovery">
+
+            <h2>Discovery Log</h2>
+
+            <p class="event">
+                Weakium was first detected during simultaneous global stress events.
+            </p>
+
+            <p class="highlight">
+                WAR ESCALATION
+            </p>
+
+            <p class="highlight">
+                CRYPTO MARKET COLLAPSE
+            </p>
+
+            <p class="highlight">
+                GLOBAL CONFIDENCE FAILURE
+            </p>
+
+            <p class="reaction">
+                Researchers began noticing abnormal trader behaviour.
+            </p>
+
+            <p>
+                Conviction levels dropped.
+            </p>
+
+            <p>
+                Emotional reactions increased.
+            </p>
+
+            <p>
+                Market participants began showing signs of weakness.
+            </p>
+
+            <p class="event">
+                Weakium particles had formed.
+            </p>
+
+            <div class="molecule">
+
+                <div class="atom"></div>
+                <div class="atom"></div>
+                <div class="atom"></div>
+                <div class="atom"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Research Terminal</h2>
+
+            <div class="terminal" id="terminal"></div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Weakness Index</h2>
+
+            <canvas id="chart" width="800" height="200"></canvas>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>Weakium Exposure Test</h2>
+
+            <p>
+                Run a diagnostic scan to measure your exposure to Weakium.
+            </p>
+
+            <button class="test-button" onclick="scan()">Run Scan</button>
+
+            <div class="result" id="result"></div>
+
+        </div>
+
+
+        <div class="footer">
+            Weakium Research Institute
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* PARTICLES */
+
+        const canvas = document.getElementById("particles")
+        const ctx = canvas.getContext("2d")
+
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        let particles = []
+
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 1,
+                speed: Math.random() * 0.3 + 0.1
+            })
+        }
+
+        function drawParticles() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            particles.forEach(p => {
+                ctx.fillStyle = "#6D8DF4"
+                ctx.beginPath()
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+                ctx.fill()
+
+                p.y -= p.speed
+
+                if (p.y < 0) {
+                    p.y = canvas.height
+                    p.x = Math.random() * canvas.width
+                }
+            })
+
+            requestAnimationFrame(drawParticles)
+
+        }
+
+        drawParticles()
+
+        /* TERMINAL */
+
+        const logs = [
+            "Scanning market psychology...",
+            "Trader conviction dropping...",
+            "Weakium particles detected...",
+            "Confidence collapse detected...",
+            "Timeline panic spreading...",
+            "Emotional trading spike..."
+        ]
+
+        const terminal = document.getElementById("terminal")
+
+        function addLog() {
+
+            let line = document.createElement("div")
+            line.textContent = "> " + logs[Math.floor(Math.random() * logs.length)]
+
+            terminal.appendChild(line)
+
+            if (terminal.children.length > 8) {
+                terminal.removeChild(terminal.children[0])
+            }
+
+        }
+        function copyAddress() {
+
+            const address = "PASTE_YOUR_CONTRACT_ADDRESS";
+
+            navigator.clipboard.writeText(address);
+
+            alert("Address copied to clipboard");
+
+        }
+        setInterval(addLog, 1800)
+        addLog()
+
+        /* CHART */
+
+        const chart = document.getElementById("chart")
+        const c = chart.getContext("2d")
+
+        let values = new Array(40).fill(40)
+
+        function drawChart() {
+
+            values.push(Math.random() * 100)
+            values.shift()
+
+            c.clearRect(0, 0, chart.width, chart.height)
+
+            c.beginPath()
+
+            values.forEach((v, i) => {
+                let x = i * (chart.width / values.length)
+                let y = chart.height - v * 1.5
+
+                if (i === 0) c.moveTo(x, y)
+                else c.lineTo(x, y)
+            })
+
+            c.strokeStyle = "#6D8DF4"
+            c.lineWidth = 2
+            c.stroke()
+
+        }
+
+        setInterval(drawChart, 800)
+
+        /* EXPOSURE TEST */
+
+        const results = [
+            "Exposure minimal — still thinking clearly.",
+            "Moderate exposure detected.",
+            "High exposure — emotional trading likely.",
+            "Severe exposure — Weakium dominating cognition.",
+            "Critical exposure — timeline brain confirmed."
+        ]
+
+        function scan() {
+
+            const result = results[Math.floor(Math.random() * results.length)]
+
+            document.getElementById("result").innerText = "Result: " + result
+
+        }
+
+    </script>
+
+</body>
+
+</html>
